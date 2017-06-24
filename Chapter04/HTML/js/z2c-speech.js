@@ -55,8 +55,20 @@ function initPage ()
         });
 
   readText.on("click",  function() {
-          console.log("initiating text-to-speech service...");
-
+          console.log("Hey John. Now initiating text-to-speech service...", $("#chat").val());
+          //jm - get token for T2S from server and when done execute callback
+          $.when($.get('/api/text-to-speech/synthesize')).done(
+            (token) => {
+              console.log('Hey Im back with your token ');
+              var textString = $("#chat").val();
+              var voice = 'en-US_AllisonVoice';
+              audio = WatsonSpeech.TextToSpeech.synthesize({
+                 text :textString, //Use text entered on screen
+                 voice : voice,
+                 token: token   //Use token passed back from server app
+               });
+              //stream.on('error', function(err) { console.log(err); });
+            });
           });
 }
 

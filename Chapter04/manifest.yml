@@ -7,4 +7,5 @@ applications:
   host: Z2C
   disk_quota: 1024M
   services:
-    - Speech to Text-xx
+    - Speech to Text-jm
+    - Text to Speech-jm

@@ -36,6 +36,19 @@ exports.stt_token = function(req, res) {
 }
 
 exports.tts_synthesize = function(req, res) {
-  console.log("tts_synthesize entered");
+  console.log("Hey John, server is now running tts_synthesize for your T2S request");
+  var sttConfig = extend(config.text_to_speech, vcapServices.getCredentials('text_to_speech'));
 
+  var sttAuthService = watson.authorization(sttConfig);
+
+  sttAuthService.getToken({
+      url: sttConfig.url
+  }, function(err, token) {
+      if (err) {
+          console.log('Error retrieving text to speech token: ', err);
+          res.status(500).send('Error retrieving text to speech token');
+          return;
+      }
+      res.send(token);
+  });
 }

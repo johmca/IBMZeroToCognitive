@@ -13,11 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var express = require('express');
-var router = express.Router();
-var speech_to_text = require('./features/speech_to_text');
+var express = require('express'); //Load express lib
+var router = express.Router(); //Create express router
+var speech_to_text = require('./features/speech_to_text'); //Load S2T and T2S logic
 
 module.exports = router;
-// speech-to-text
+
+//DEFINE ROUTES....
+
+// speech-to-text endpoint - execute stt_token
 router.get('/api/speech-to-text/token*',speech_to_text.stt_token);
+
+//text to speech endpoint - execute tts_synthesize
 router.get('/api/text-to-speech/synthesize*',speech_to_text.tts_synthesize);

@@ -6,6 +6,14 @@
 
     <title>Learn Bluemix Now!</title>
 
+<!--JM01 The class is important as it is used by the pageStyles.css to determine presentation of the web page
+    JM01 Also the onLoad function tells the page which javascript fucntion to run when the page loads
+    JM01 In this case initPage is executed. initPage can be found in js/z2c-speech.js which is loaded by
+    JM01 the code at the bottom of this file. initPage sets the properties of the microphone and end buttons
+    JM01 to their inital state by manipulating classes associated with each. The classes are rendered appropriatley
+    JM01 by the css file - bascially the microphone is on by default and the button is greyed out whiel the stop
+    JM01 button is off by default and is not greyed out
+  -->
      </head><body class="tutorial" onLoad="initPage()">
         <div class="cover">
             <div class="navbar">
@@ -51,7 +59,9 @@
 
           </div>
 
-    <!-- Placed at the end of the document so the pages load faster -->
+    <!-- Placed at the end of the document so the pages load faster
+     JM01  These are the javascript files that contain the fucntions executed from this webpage
+      -->
 
     <script src="js/jquery-3.1.0.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
