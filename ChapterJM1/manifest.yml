@@ -9,4 +9,4 @@ applications:
   services:
     - Speech to Text-jm
     - Text to Speech-jm
-    - Language Translator-jm
+    - Language Translator-jm2
