@@ -55,21 +55,27 @@ function initPage ()
         });
 
   readText.on("click",  function() {
-          console.log("Hey John. Now initiating text-to-speech service...", $("#chat").val());
+
           //jm - get token for T2S from server and when done execute callback
-          $.when($.get('/api/text-to-speech/synthesize')).done(
-            (token) => {
-              console.log('Hey Im back with your token ');
-              var textString = $("#chat").val();
-              var voice = 'de-DE_BirgitVoice';
-              audio = WatsonSpeech.TextToSpeech.synthesize({
-                 text :textString, //Use text entered on screen
-                 voice : voice,
-                 token: token   //Use token passed back from server app
-               });
-              //stream.on('error', function(err) { console.log(err); });
+          untranslatedText = $("#chat").val();
+          console.log(`Hey John. Now initiating text-to-speech service...${untranslatedText}`);
+          $.when($.get(`/api/translate/p?text=${untranslatedText}`)).done((translatedText)=>{
+            $.when($.get('/api/text-to-speech/synthesize')).done(
+              (token) => {
+                console.log('Hey Im back with your token ');
+                //var textString = $("#chat").val();
+                textString = translatedText;
+                var voice = 'es-ES_EnriqueVoice';
+                audio = WatsonSpeech.TextToSpeech.synthesize({
+                   text :textString, //Use text entered on screen
+                   voice : voice,
+                   token: token   //Use token passed back from server app
+                 });
+                //stream.on('error', function(err) { console.log(err); });
+              });
             });
-          });
+        });
+
 }
 
 function onCanplaythrough() {
