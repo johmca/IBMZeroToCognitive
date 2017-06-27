@@ -15,22 +15,26 @@
  */
 // displayNLC results
 //Args i) _display is the name of the html file containing the pop up window
-//     ii) _source is the output from StT
+//     ii) _source is an HTML element
+//          - if called from classifySpeech button this willbe stt_out ()
+//          - if called from classifyText button this will be the text are (#chat)
 function checkNLC(_display, _source)
 {
   var options = {};
-  options.cquery = _source[0].innerHTML; //Extract text entered into HTML and stick it in cquery property of object
+  options.cquery = _source[0].value; //Extract text entered into HTML and stick it in cquery property of object
   //Execute get(_display) and do a POST to the classify endpoint
   //When these things are done then execute our function pasing
   //  i)   _page which is the result from get(_display) and is essentially the HTML for our new screen
   //) ii)  _nlc_results is the result passed back on the POST from the NLC
+  console.log(`Running client side checkNLC function..._source=${_source[0].value}, data sent=${options.cquery}`);
   $.when($.get(_display), $.post('/api/understand/classifyInd', options)).done(function(_page, _nlc_results){
-    console.log("page returned",_display); //Open up tools in Chrome to see this
+
     var _target= $("#modal"); //modal is the name of the empty div we added o index.html
     _target.append(_page); //add the HTML retirved by get(_display) above to the div
     _target.height($(window).height()); //set height of our div to height of main window (full screen)
     _target.show(); //Display it
     _data = _nlc_results[0]; //Use first row in results
+    console.log('Data',_data);
     //Parse data twice becuase we did stringify twice
     //classes are key value pairs of industry and confidence
     _classes = JSON.parse(JSON.parse(_data).results).classes;
@@ -64,9 +68,9 @@ function displayNLC(_target, _results)
          _classConfidence = data[_idx]["confidence"];//Get confidence
       //Add HTML for a new row to target table (_cStr used here to make it shorter)
         target.append("<tr><td style='width: 60%'>"+_className +"</td><td>"+
-        classConfidence+"</td></tr>");
+        _classConfidence+"</td></tr>");
         })
-      (_idx, _results) 
+      (_idx, _results)
     _idx++; //increment counter
   }
   target.append("</table>"); //Add closing HTML parenthesis

@@ -32,7 +32,7 @@ var serviceCreds = appEnv.getServiceCreds(WATSON_NLC_SERVICE_NAME) || process.en
 //Create instance of NLC passing our service creds
 var natural_language_classifier = watson.natural_language_classifier(serviceCreds);
 //Create instance of the classifier to use
-var classifier_id_industry = process.env.NLC_CLASSIFIER_ID || "your classifier id goes inside these quote marks";
+var classifier_id_industry = process.env.NLC_CLASSIFIER_ID || "359f3fx202-nlc-117822";
 
 //Export the function which calls the NLC service so it can be referenced
 //by the router
