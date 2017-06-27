@@ -25,13 +25,13 @@ node index.js
 
  
 
-If running this sometime in the future then it is likley that the NLC service
-instance referred to here will be long gone so you woudl need to follow the
-steps in the Chapter05 JIM notes to
+If running this sometime in the future then it is likely that the NLC service
+instance referred to here will be long gone so you would need to follow the
+steps in the Chapter05 JM notes to
 
 1.  Create a new NLC service instance
 
-2.  Obtain service credentials and update the env.json file with these
+2.  Obtain new service credentials and update the env.json file with these
 
 3.  Create a new classifier using the industry.csv file, obtain the classifier
     id and update **classifier.js **(line 35) with the classifier id
@@ -51,75 +51,7 @@ text area this no longer works and I need to use .value instead.
 Server Changes
 --------------
 
- 
-
- 
-
-The new file **classifer.js** exports a single method **classifyInd** and uses a
-private helper function to format the JSON coming back from NLC for printing
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//Require libraries
-var extend = require('extend'); //Extend one object by adding other objects
-var cfenv = require('cfenv'); //Cloud Foundry environmen tlib
-var watson = require('watson-developer-cloud'); //Watson SDK
-//Require local files
-var config = require("../../env.json"); //Local environment parms
-
-var WATSON_NLC_SERVICE_NAME = "Watson-NLC-Service";
-
-//Create application environment object from CF environment
-var appEnv = cfenv.getAppEnv();
-
-//Build service credentials - note use of config.watson_nlc - watson_nlc is the name of the
-//NLC credentials section in our env.json
-var serviceCreds = appEnv.getServiceCreds(WATSON_NLC_SERVICE_NAME) || process.env.NLC_CREDS || config.watson_nlc;
-
-//Create instance of NLC passing our service creds
-var natural_language_classifier = watson.natural_language_classifier(serviceCreds);
-//Create instance of the classifier to use
-var classifier_id_industry = process.env.NLC_CLASSIFIER_ID || "your classifier id goes inside these quote marks";
-
-//Export the function which calls the NLC service so it can be referenced 
-//by the router
-//This function receives request and response obects from browser
-exports.classifyInd = function(req, res) {
-  console.log("Classifier entered");
-  _text = req.body.cquery; //retrieve text from message body
-  i_output = {};
-  (function(_res) {
-    //Call NLC classify function passing
-    //i)  Object containing text and classifier to use
-    //ii) A call back function to execute on completion
-      natural_language_classifier.classify({
-              text: _text,
-              classifier_id: classifier_id_industry
-          },
-          //Callback function sends back sattus = 200 and formatted result
-          function(err, response) {
-              _res.writeHead(200, { "Content-Type": "text/plain" });
-              _res.end(nlc_res("Industry", err, response));
-          });
-  })(res)
-}
-
-//This private function formats the results that come back from NLC for
-//presentaiton in our pop up window
-function nlc_res(classifier, err, response) {
-  var _output = [];
-  if (err) {
-      console.log(classifier + ' error:', err);
-      _output = { 'error': JSON.stringify(err, null, 2) };
-  } else {
-      _output = { results: JSON.stringify(response, null, 2) };
-  }
-  console.log("Printing from nlc_res");
-  console.log(_output);
-  return (JSON.stringify(_output, null, 2));
-}
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
- 
+None were required
 
  
 
@@ -157,31 +89,61 @@ as “ClassifySpeech”.
 
  
 
-Things to note
-
-1.  displayNLC calls checkNLC
-
-2.  nlcPage specifies a new html page called displayNLC.
-
-3.  stt_out is created elsewhere and used as the output from StT
-
- 
-
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- displayNLC.on("click",  function()
-    {
+  
+  var classifyText = $("#classifyText"); //assign variable to new button
+  var chat = $("#chat");                 //assign variable to input text area
+
+  //Click on classifyText button - same as classifySpeech except we
+  //simply pass the input text entered into the text area
+  classifyText.on("click",()=>{
       var nlcPage = "displayNLC.html";
-      checkNLC(nlcPage, stt_out);
-    });
+      checkNLC(nlcPage, chat);
+  });
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
  
 
-Our new JavaScript file z2c-NLC.js contains two functions
+I need to make a change to checkNLC() because the innerHTML property that
+contains the text for classification when executed from the Classify Speech
+button no longer holds the text when executing from the Classify Text button and
+I used .value instead.
 
--   checkNLC is called when new Classify Speech button is pressed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+function checkNLC(_display, _source)
+{
+  var options = {};
+  options.cquery = _source[0].value; //Extract text entered into HTML and stick it in cquery property of object
+  //Execute get(_display) and do a POST to the classify endpoint
+  //When these things are done then execute our function pasing
+  //  i)   _page which is the result from get(_display) and is essentially the HTML for our new screen
+  //) ii)  _nlc_results is the result passed back on the POST from the NLC
+  console.log(`Running client side checkNLC function..._source=${_source[0].value}, data sent=${options.cquery}`);
+  $.when($.get(_display), $.post('/api/understand/classifyInd', options)).done(function(_page, _nlc_results){
 
--   displayNLC is called to present results of NLC back to page
+    var _target= $("#modal"); //modal is the name of the empty div we added o index.html
+    _target.append(_page); //add the HTML retirved by get(_display) above to the div
+    _target.height($(window).height()); //set height of our div to height of main window (full screen)
+    _target.show(); //Display it
+    _data = _nlc_results[0]; //Use first row in results
+    console.log('Data',_data);
+    //Parse data twice becuase we did stringify twice
+    //classes are key value pairs of industry and confidence
+    _classes = JSON.parse(JSON.parse(_data).results).classes;
+    //Call displayNLC fucntion passing ane of our table and classes array
+    displayNLC($("#industryResult"), _classes);
+    //Create close button within our div and define click function
+    closeNLC=$("#close_NLC");
+    closeNLC.on("click", function(){
+      console.log("closeNLC clicked.")
+      $("#modal").empty();
+    });
+  });
+
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ 
 
  
 
