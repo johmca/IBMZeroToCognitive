@@ -1,27 +1,33 @@
-Zero T Cognitive Lecture Series - Chapter 05
-============================================
+Zero To Cognitive Lecture Series - Chapter 05 - JM Enhancement
+==============================================================
 
  
 
 About
 -----
 
-This version of the app is a modification of Chapter05 app which adds a button
-to classify any text input into the text area. The user can choose to have
-Watson speak this text or classify this text. If speak is selected then the text
-goes to Watson TtS as before. If classify is clicked then the text goes to
+Thie JM version of the app is a modification of the Z2C Chapter05 app which adds
+a button to classify any text input into the text area. The user can choose to
+have Watson speak this text or classify this text. If speak is selected then the
+text goes to Watson TtS as before. If classify is clicked then the text goes to
 Watson NLC and the results are displayed in a pop up window same as for
 classifying the spoken word as demonstrated in standard Chapter05.
 
  
 
 After completing Chapter05 I simply copied the entire folder to Chapter05-jm.
-There wereno additional set up steps required to the run the Chapter04-jm app
-simply naviagte to the project folder and
+This included all npm modules in node_modules folder so no need for another
+init. There were no additional set up steps required to the run the Chapter05-jm
+app simply naviagte to the project folder and execute
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 node index.js
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ 
+
+Then go to the browser and navigate to localhost: port number the server is
+listening on to view the screen.
 
  
 
@@ -34,17 +40,25 @@ steps in the Chapter05 JM notes to
 2.  Obtain new service credentials and update the env.json file with these
 
 3.  Create a new classifier using the industry.csv file, obtain the classifier
-    id and update **classifier.js **(line 35) with the classifier id
+    id and update **classifier.js** (line 35) with the classifier id
 
  
 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//Create instance of the classifier to use
+
+var classifier_id_industry = process.env.NLC_CLASSIFIER_ID || "359f3fx202-nlc-117822"; //Use the id of your classifier here
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
  
 
-Note - my changes break the capability to classify speech. This is because of
-the way the app in Chapter05 was coded. The HTML element containing the text
-gets passed into the checkNLC function and the text value of the element is
-extracted there using the innerHTML property. Unfortunately when I pass in the
-text area this no longer works and I need to use .value instead.
+Note - I think my changes break the capability to classify speech. This is
+because of the way the app in Chapter05 was coded. The HTML element containing
+the text gets passed into the checkNLC function and the text value of the
+element is extracted there using the innerHTML property. Unfortunately when I
+pass in the text area this no longer works and I need to use the value property
+instead. This could be fixed I’m sure but I don’t have time and I won’t learn
+anything of great value from doing it so I’m leaving it for now.
 
  
 
